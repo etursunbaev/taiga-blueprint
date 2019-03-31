@@ -1,0 +1,52 @@
+---
+- name: Clone Taiga Backend Repo
+  git:
+    repo: https://github.com/taigaio/taiga-events.git
+    dest: ~/taiga-events
+    clone: yes
+    version: stable
+  become: true
+  become_user: taiga
+
+- name: add apt key for nodesource
+  apt_key:
+    url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+
+- name: add repo for nodesource
+  apt_repository:
+    repo: 'deb https://deb.nodesource.com/node_0.10 stretch main' 
+    update_cache: yes
+
+- name: install nodejs
+  apt: 
+    name: nodejs
+    state: present
+
+- name: Install packages based on package.json using the npm installed with nvm v0.10.1.
+  npm:
+    path: ~/taiga-events
+    executable: /opt/nvm/v0.10.1/bin/npm
+    state: present
+  become: true
+  become_user: taiga
+
+- name: Upload config file
+  template: 
+    src: config.example.j2
+    dest: ~/taiga-events/
+  become: true
+  become_user: taiga
+
+- name: Upload taiga_events.service
+  template:
+    src: taiga_events.service
+    dest: /lib/systemd/system/taiga_events.service
+  register: service
+
+- name: Enable and start taiga_event.service
+  systemd:
+    name: taiga_events.service
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  when: service.changed

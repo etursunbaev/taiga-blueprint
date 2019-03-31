@@ -1,0 +1,16 @@
+---
+- name: Clone Taiga Frontend Repo
+  git:
+    repo: https://github.com/taigaio/taiga-front-dist.git
+    dest: ~/taiga-frontend
+    clone: yes
+    version: stable
+  become: true
+  become_user: taiga
+    
+- name: Upload config frontend
+  template:
+    src: conf.example.j2
+    dest: ~/taiga-frontend/dist/conf.json
+  become: true
+  become_user: taiga

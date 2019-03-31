@@ -1,0 +1,33 @@
+from .common import *
+
+MEDIA_URL = "http://{{ domain_name }}/media/"
+STATIC_URL = "http://{{ domain_name }}/static/"
+SITES["front"]["scheme"] = "http"
+SITES["front"]["domain"] = "{{ domain_name }}"
+
+SECRET_KEY = "{{ private_secret_key }}"
+
+DEBUG = False
+PUBLIC_REGISTER_ENABLED = True
+
+DEFAULT_FROM_EMAIL = "no-reply@{{ domain_name }}"
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+#CELERY_ENABLED = True
+
+EVENTS_PUSH_BACKEND = "taiga.events.backends.rabbitmq.EventsPushBackend"
+EVENTS_PUSH_BACKEND_OPTIONS = {"url": "amqp://taiga:{{ rabbitmq_taiga_pwd }}@localhost:5672/taiga"}
+
+# Uncomment and populate with proper connection parameters
+# for enable email sending. EMAIL_HOST_USER should end by @domain.tld
+#EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+#EMAIL_USE_TLS = False
+#EMAIL_HOST = "localhost"
+#EMAIL_HOST_USER = ""
+#EMAIL_HOST_PASSWORD = ""
+#EMAIL_PORT = 25
+
+# Uncomment and populate with proper connection parameters
+# for enable github login/singin.
+#GITHUB_API_CLIENT_ID = "yourgithubclientid"
+#GITHUB_API_CLIENT_SECRET = "yourgithubclientsecret"

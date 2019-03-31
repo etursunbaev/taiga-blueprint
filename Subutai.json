@@ -1,0 +1,100 @@
+
+{
+    "name": "${environmentName}",
+    "description": "Taiga is a project management platform for agile developers & designers and project managers who want a beautiful tool that makes work truly enjoyable.",
+    "version": "1.0.0",
+    "author": "https://github.com/etursunbaev",
+    "containers": [
+        {
+            "hostname": "${webContainerName}",
+            "template": "debian-stretch",
+            "peer-criteria": "HTTP-GROUP",
+            "size": "${containerSize}",
+            "port-mapping": [
+                {
+                    "protocol": "https",
+                    "domain": "${domainName}",
+                    "internal-port": "80",
+                    "external-port": "443"
+                }
+            ]
+        }
+    ],
+    "peer-criteria": [
+        {
+            "name": "HTTP-GROUP"
+        }
+    ],
+    "ansible-configuration": {
+        "source-url": "https://github.com/etursunbaev/taiga-blueprint/archive/master.zip",
+        "ansible-playbook": "site.yml",
+        "extra-vars": [
+            {
+                "key": "domain_name",
+                "value": "${domainName}"
+            }, 
+            {
+                "key": "postgre_taiga_pwd",
+                "value": "${postgrePwd}"
+            },
+            {
+                "key": "rabbitmq_taiga_pwd",
+                "value": "${rabbitmqPwd}"
+            },
+            {
+                "key": "private_secret_key",
+                "value": "${privateKey}"
+            }
+        ],
+        "groups": [
+            {
+                "name": "tbp",
+                "hostnames": [
+                    "${webContainerName}"
+                ]
+            }
+        ]
+    },
+    "user-variables": {
+        "environmentName": {
+            "description": "Enter the environment name",
+            "type": "string",
+            "default": "tbp",
+            "validation": "[a-zA-Z0-9]+"
+        },
+        "domainName": {
+            "description": "Enter the application domain name",
+            "type": "domain",
+            "default": "change.the.domain",
+            "validation": "[a-zA-Z0-9]+"
+        },
+        "postgrePwd": {
+            "description": "PostgreSQL db taiga user password",
+            "type": "string",
+            "default": "taiga"
+        },
+        "rabbitmqPwd": {
+            "description": "RabbitMQ taiga user password",
+            "type": "string",
+            "default": "taiga"
+        },
+        "privateKey": {
+            "description": "Private Secret Key",
+            "type": "string",
+            "default": "SuperSecretKey",
+            "validation": "[a-zA-Z0-9]+"
+        },
+        "webContainerName": {
+            "description": "Enter the container's hostname",
+            "type": "string",
+            "default": "tbp",
+            "validation": "[a-zA-Z0-9]+"
+        },
+        "containerSize": {
+            "description": "Container Size",
+            "type": "enum",
+            "default": "MEDIUM",
+            "validation": "MEDIUM,LARGE,HUGE"
+        }
+    }
+}

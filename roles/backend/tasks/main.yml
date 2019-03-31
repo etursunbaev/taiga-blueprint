@@ -1,0 +1,67 @@
+---
+- name: Clone Taiga Backend Repo
+  git:
+    repo: https://github.com/taigaio/taiga-back.git
+    dest: ~/taiga-backend
+    clone: yes
+    version: stable
+  become: true
+  become_user: taiga
+
+- name: Create virtualenv and install dependencies
+  shell: |
+    echo "export WORKON_HOME=$HOME/.virtualenvs" >> .bashrc
+    echo "export PROJECT_HOME=$HOME/taiga-backend" >> .bashrc
+    echo "export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.5" >> .bashrc
+    source /usr/share/virtualenvwrapper/virtualenvwrapper.sh 
+    mkvirtualenv -p /usr/bin/python3.5 taiga
+    pip install -r requirements.txt
+    python manage.py migrate --noinput
+    python manage.py loaddata initial_user
+    python manage.py loaddata initial_project_templates
+    python manage.py compilemessages
+    python manage.py collectstatic --noinput
+  args:
+    chdir: ~/taiga-backend
+    executable: /bin/bash
+  become: true
+  become_user: taiga
+  tags: venv
+
+- name: Upload config file local.py
+  template:
+    src: local.py.j2
+    dest: ~/taiga-backend/settings/local.py
+  become: true
+  become_user: taiga  
+
+- name: Upload taiga.service
+  template:
+    src: taiga.service
+    dest: /lib/systemd/system/taiga.service
+  register: taigab
+
+- name: Enable and start taiga.service
+  systemd: 
+    name: taiga.service
+    state: started
+    enabled: yes
+    daemon-reload: yes
+  when: taigab.changed
+
+- name: Remove nginx default config file
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Upload nginx taiga config file
+  template:
+    src: taiga.conf
+    dest: /etc/nginx/sites-enabled/taiga.conf
+  register: nginx
+  
+- name: Reload Nginx
+  systemd:
+    name: nginx.service
+    state: reloaded
+  when: nginx.changed

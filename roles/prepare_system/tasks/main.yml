@@ -1,0 +1,105 @@
+---
+- name: Install required packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - build-essential
+    - binutils-doc
+    - autoconf
+    - flex
+    - bison 
+    - libjpeg-dev
+    - libfreetype6-dev
+    - zlib1g-dev
+    - libzmq3-dev
+    - libgdbm-dev
+    - libncurses5-dev
+    - automake
+    - libtool
+    - libffi-dev
+    - curl
+    - git
+    - tmux
+    - gettext
+    - nginx
+    - rabbitmq-server
+    - redis-server
+    - postgresql
+    - postgresql-contrib
+    - postgresql-doc
+    - postgresql-server-dev-all
+    - python3 
+    - python3-pip
+    - python-dev
+    - python3-dev
+    - python-pip
+    - python3-venv
+    - virtualenvwrapper
+    - libxml2-dev
+    - libxslt-dev
+    - libssl-dev
+    - libffi-dev
+    - python3-psycopg2
+
+
+- name: Add system group "taiga"
+  group:
+    name: taiga
+    state: present
+
+- name: Create system user taiga
+  user:
+    name: taiga
+    system: yes
+    createhome: yes
+    home: /home/taiga
+    shell: /bin/bash
+    group: taiga
+
+- name: Validate sudoers
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^%taiga ALL='
+    line: '%taiga ALL=(ALL) NOPASSWD: ALL'
+    validate: '/usr/sbin/visudo -cf %s'
+
+- name: Ensure a locale exists
+  locale_gen:
+    name: en_US.UTF-8
+    state: present
+
+- name: Create database taiga
+  postgresql_db:
+    name: taiga
+    state: present
+    encoding: UTF-8
+    template: template0
+  become: true
+  become_user: postgres
+
+- name: Create database user taiga
+  postgresql_user:
+    db: taiga
+    name: taiga
+    password: "{{ postgre_taiga_pwd }}"
+    priv: ALL
+  become: true
+  become_user: postgres
+
+- name: Add RabbitMQ Vhost taiga
+  rabbitmq_vhost:
+    name: /taiga
+    state: present
+    node: rabbit@stretch
+
+- name: Add RabbitMQ user taiga
+  rabbitmq_user:
+    user: taiga
+    password: "{{ rabbitmq_taiga_pwd }}"
+    vhost: /taiga
+    configure_priv: .*
+    read_priv: .*
+    write_priv: .*
+    state: present

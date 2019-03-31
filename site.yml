@@ -1,0 +1,8 @@
+---
+- hosts: tbp
+  remote_user: root
+  roles:
+    - prepare_system
+    - frontend
+    - events
+    - backend
