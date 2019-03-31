@@ -93,7 +93,7 @@
   rabbitmq_vhost:
     name: /taiga
     state: present
-    node: rabbit@stretch
+    node: rabbit@{{ container_hostname }}
 
 - name: Add RabbitMQ user taiga
   rabbitmq_user:
