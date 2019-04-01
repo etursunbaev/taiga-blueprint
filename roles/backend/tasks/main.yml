@@ -1,5 +1,5 @@
 ---
-- name: Clone Taiga Backend Repo
+- name: Clone Backend
   git:
     repo: https://github.com/taigaio/taiga-back.git
     dest: ~/taiga-backend
