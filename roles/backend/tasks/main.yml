@@ -4,7 +4,7 @@
     repo: https://github.com/taigaio/taiga-back.git
     dest: ~/taiga-backend
     clone: yes
-    version: stable
+    version: "4.2.2"
   become: true
   become_user: taiga
 
