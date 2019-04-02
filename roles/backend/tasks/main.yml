@@ -4,20 +4,7 @@
     repo: https://github.com/taigaio/taiga-back.git
     dest: ~/taiga-backend
     clone: yes
-  become: true
-  become_user: taiga
-
-- name: Wait until the file is present before continuing
-  wait_for:
-    path: ~/taiga-backend
-  become: true
-  become_user: taiga
-
-- name: Checkout Taiga Backend Repo
-  git:
-    repo: https://github.com/taigaio/taiga-back.git
-    dest: ~/taiga-backend
-    version: "stable"
+    version: stable
   become: true
   become_user: taiga
 

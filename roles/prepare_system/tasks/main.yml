@@ -42,6 +42,7 @@
     - libssl-dev
     - libffi-dev
     - python-psycopg2
+    - apt-transport-https
 
 
 - name: Add system group "taiga"
