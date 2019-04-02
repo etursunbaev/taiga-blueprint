@@ -1,8 +1,8 @@
 from .common import *
 
-MEDIA_URL = "http://{{ domain_name }}/media/"
-STATIC_URL = "http://{{ domain_name }}/static/"
-SITES["front"]["scheme"] = "http"
+MEDIA_URL = "https://{{ domain_name }}/media/"
+STATIC_URL = "https://{{ domain_name }}/static/"
+SITES["front"]["scheme"] = "https"
 SITES["front"]["domain"] = "{{ domain_name }}"
 
 SECRET_KEY = "{{ private_secret_key }}"
